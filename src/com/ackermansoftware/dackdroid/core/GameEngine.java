@@ -2,6 +2,7 @@ package com.ackermansoftware.dackdroid.core;
 
 import java.util.ArrayList;
 
+import android.content.Context;
 import android.view.SurfaceHolder;
 
 import com.ackermansoftware.dackdroid.GameLogic;
@@ -19,8 +20,8 @@ import com.ackermansoftware.dackdroid.renderer.GameRenderer;
  */
 public class GameEngine {
 
-	private static final int rendererFrameRate = 50;
-	private static final int gameLogicFrameRate = 50;
+	private static final int rendererFrameRate = 10; // fps
+	private static final int gameLogicFrameRate = 1; // fps
 
 	long totalFramesRendered = 0;
 	double averageFrameRate = 0.0;
@@ -37,8 +38,8 @@ public class GameEngine {
 
 
 	// Setup all our game objects here.
-	public GameEngine(SurfaceHolder holder) {
-		renderer = new GameRenderer(holder);
+	public GameEngine(SurfaceHolder holder, Context context) {
+		renderer = new GameRenderer(holder, context.getResources());
 		gameLogic = new GameLogic(renderer);
 
 		createThreads();
@@ -67,7 +68,7 @@ public class GameEngine {
 
 		public GameThread(ThreadedGameComponent renderer, int requestedFrameRate) {
 			this.gameComponent = renderer;
-			this.requestedMsPerFrame = requestedFrameRate;
+			this.requestedMsPerFrame = 1000 / requestedFrameRate;
 		}
 
 		@Override

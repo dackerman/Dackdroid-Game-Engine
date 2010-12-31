@@ -1,22 +1,28 @@
 package com.ackermansoftware.dackdroid;
 
+import java.util.ArrayList;
+
 import com.ackermansoftware.dackdroid.core.ThreadedGameComponent;
 import com.ackermansoftware.dackdroid.renderer.RenderQueue;
 
-import android.util.Log;
-
 public class GameLogic implements ThreadedGameComponent {
 
-	private final RenderQueue renderer;
-	private int value = 0;
+	private final RenderQueue renderQueue;
+	private final ArrayList<GameObject> gameObjects = new ArrayList<GameObject>();
 
 	public GameLogic(RenderQueue renderer) {
-		this.renderer = renderer;
+		this.renderQueue = renderer;
+		Tile tile = new Tile();
+		gameObjects.add(tile);
+
 	}
 
 	@Override
 	public void executeFrame() {
-		Log.d("GameLogic", "Howdy, from the GameLogic thread! value:"+value++);
+		for (GameObject gameObject : gameObjects) {
+			gameObject.think(renderQueue);
+		}
+		renderQueue.frameComplete();
 	}
 
 }

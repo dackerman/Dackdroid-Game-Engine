@@ -9,7 +9,19 @@ package com.ackermansoftware.dackdroid.renderer;
  * 
  */
 public interface RenderQueue {
+	/**
+	 * Add a Renderable to the renderQueue for this frame. This may be called
+	 * any number of times before a frameComplete() call.
+	 * 
+	 * @param r
+	 *            Renderable object which should be rendered this frame.
+	 */
 	public void addToQueue(Renderable r);
 
-	public void clearRenderQueue();
+	/**
+	 * Tells the RenderQueue that this frame has no more draw calls. In a
+	 * double-buffered system, this tells the renderer that it should swap
+	 * buffers and render the scene that was just built.
+	 */
+	public void frameComplete();
 }

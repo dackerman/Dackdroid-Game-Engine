@@ -12,23 +12,23 @@ public class EngineSurfaceView extends SurfaceView implements SurfaceHolder.Call
 
 	public EngineSurfaceView(Context context) {
 		super(context);
-		init();
+		init(context);
 	}
 
 	public EngineSurfaceView(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		init();
+		init(context);
 	}
 
 	public EngineSurfaceView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
-		init();
+		init(context);
 	}
 
-	private void init(){
+	private void init(Context context) {
 		SurfaceHolder holder = getHolder();
 		holder.addCallback(this);
-		engine = new GameEngine(holder);
+		engine = new GameEngine(holder, context);
 	}
 
 	@Override
