@@ -7,8 +7,8 @@ This is the 2D Game Engine I am building to use with my own 2D Games on
 Android.  Right now, although you can see all the source, I am *NOT* allowing it
 to be used freely.  The reason is two fold:
 
-# I don't want people to think it is "working" yet, so I am not yet soliciting critiques.
-# There is nothing special for now, so I don't care if people see the source code.
+1. I don't want people to think it is "working" yet, so I am not yet soliciting critiques.
+2. There is nothing special for now, so I don't care if people see the source code.
 
 Conclusion
 ----------
