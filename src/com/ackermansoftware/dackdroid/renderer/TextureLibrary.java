@@ -1,8 +1,11 @@
 package com.ackermansoftware.dackdroid.renderer;
 
+import java.util.HashMap;
+
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 
 import com.ackermansoftware.dackdroid.exceptions.InvalidResourceException;
 
@@ -12,6 +15,8 @@ public class TextureLibrary {
 	public TextureLibrary(Resources res) {
 		this.res = res;
 	}
+
+	HashMap<Integer, Bitmap> cache = new HashMap<Integer, Bitmap>();
 
 	/**
 	 * Returns a Bitmap for the given resourceId. This value may be reused by
@@ -24,9 +29,16 @@ public class TextureLibrary {
 	 * @return Bitmap relating to the given Id.
 	 */
 	public Bitmap getTexture(int resourceId) {
-		Bitmap b = BitmapFactory.decodeResource(res, resourceId);
-		if (b == null) {
-			throw new InvalidResourceException();
+		Bitmap b;
+		if (cache.containsKey(resourceId)) {
+			b = cache.get(resourceId);
+		} else {
+			Log.d("TextureLibrary", "Resource " + resourceId + " not in cache... fetching");
+			b = BitmapFactory.decodeResource(res, resourceId);
+			if (b == null) {
+				throw new InvalidResourceException();
+			}
+			cache.put(resourceId, b);
 		}
 		return b;
 	}

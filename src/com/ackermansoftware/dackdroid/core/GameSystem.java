@@ -1,0 +1,48 @@
+package com.ackermansoftware.dackdroid.core;
+
+import android.content.Context;
+import android.graphics.PointF;
+import android.view.SurfaceHolder;
+
+import com.ackermansoftware.dackdroid.renderer.GameRenderer;
+
+/**
+ * The GameSystem initializes and holds all of the services the various game
+ * components might want. These are essentially global variables, but each
+ * object can only access them through their public interface, thereby not
+ * violating encapsulation.
+ * 
+ * @author dackerman
+ * 
+ */
+public class GameSystem {
+	private final GameRenderer renderer;
+	private final GameLogic logic;
+	private final CameraSystem cameraSystem;
+	private final World world;
+
+	public GameSystem(SurfaceHolder holder, Context context) {
+		cameraSystem = new CameraSystem(new PointF(0f, 0f));
+		renderer = new GameRenderer(holder, context.getResources(), cameraSystem);
+		world = new World();
+		logic = new GameLogic(renderer, world);
+	}
+
+	public GameRenderer getRenderer() {
+		return renderer;
+	}
+
+
+	public GameLogic getGameLogic() {
+		return logic;
+	}
+
+	public CameraSystem getCameraSystem() {
+		return cameraSystem;
+	}
+
+	public World getWorld() {
+		return world;
+	}
+
+}

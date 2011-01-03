@@ -6,8 +6,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.PointF;
 import android.view.SurfaceHolder;
 
+import com.ackermansoftware.dackdroid.core.CameraSystem;
 import com.ackermansoftware.dackdroid.core.ThreadedGameComponent;
 
 public class GameRenderer implements ThreadedGameComponent, RenderQueue {
@@ -24,13 +26,16 @@ public class GameRenderer implements ThreadedGameComponent, RenderQueue {
 
 	private final TextureLibrary textures;
 
+	private final CameraSystem camera;
+
 	// We will check this variable to see if we have already rendered the
 	// current frame, in the case that the render thread is faster than the game
 	// logic.
 	private final AtomicBoolean alreadyRendered = new AtomicBoolean(false);
 
-	public GameRenderer(SurfaceHolder holder, Resources res) {
+	public GameRenderer(SurfaceHolder holder, Resources res, CameraSystem camera) {
 		this.surfaceholder = holder;
+		this.camera = camera;
 		textures = new TextureLibrary(res);
 
 		// Set front and back buffers. Front buffer is being currently rendered,
@@ -40,12 +45,16 @@ public class GameRenderer implements ThreadedGameComponent, RenderQueue {
 		backBuffer = buffer2;
 	}
 
+	// Perf
+	// millisPerFrame: 435.75
+
 	@Override
 	public void executeFrame() {
 		// If we already rendered the current frame, exit early!
 		if (alreadyRendered.get()) {
 			return;
 		}
+		final PointF cameraPos = camera.getCameraPosition();
 		Canvas c = null;
 		try {
 			c = surfaceholder.lockCanvas(null);
@@ -53,9 +62,12 @@ public class GameRenderer implements ThreadedGameComponent, RenderQueue {
 				// Nobody touch the frontBuffer right now!
 				synchronized (frontBuffer) {
 					c.drawColor(Color.BLACK);
+					c.save();
+					c.translate(cameraPos.x, cameraPos.y);
 					for (Renderable r : frontBuffer) {
 						r.render(textures, c);
 					}
+					c.restore();
 					alreadyRendered.set(true);
 				}
 			}

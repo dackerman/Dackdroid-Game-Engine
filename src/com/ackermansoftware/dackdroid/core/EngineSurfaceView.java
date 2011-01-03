@@ -9,26 +9,46 @@ import android.view.SurfaceView;
 public class EngineSurfaceView extends SurfaceView implements SurfaceHolder.Callback{
 
 	private GameEngine engine;
+	private GameSystem system;
+
+	private final Context context;
 
 	public EngineSurfaceView(Context context) {
 		super(context);
-		init(context);
+		this.context = context;
 	}
 
 	public EngineSurfaceView(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		init(context);
+		this.context = context;
 	}
 
 	public EngineSurfaceView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
-		init(context);
+		this.context = context;
 	}
 
-	private void init(Context context) {
+	public void init(GameEngineSettings settings) {
 		SurfaceHolder holder = getHolder();
 		holder.addCallback(this);
-		engine = new GameEngine(holder, context);
+		system = new GameSystem(holder, context);
+		engine = new GameEngine(system, settings);
+	}
+
+	public GameSystem getGameSystem() {
+		if (system == null) {
+			throw new RuntimeException(
+			"gameSystem is null! Did you call init(GameSettings) on the gameView yet?");
+		}
+		return system;
+	}
+
+	public GameEngine getGameEngine() {
+		if (system == null) {
+			throw new RuntimeException(
+			"gameEngine is null! Did you call init(GameSettings) on the gameView yet?");
+		}
+		return engine;
 	}
 
 	@Override
@@ -39,7 +59,16 @@ public class EngineSurfaceView extends SurfaceView implements SurfaceHolder.Call
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
 		Log.d("EngineSurfaceView", "Surface created - starting up game.");
+		ensureSystemIsInitialized();
 		engine.enable();
+	}
+
+	private void ensureSystemIsInitialized() {
+		// If init() hasn't been called with custom settings, just call it with
+		// the default settings.
+		if (engine == null || system == null) {
+			init(new GameEngineSettings());
+		}
 	}
 
 	@Override

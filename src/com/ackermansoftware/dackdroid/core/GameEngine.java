@@ -2,10 +2,6 @@ package com.ackermansoftware.dackdroid.core;
 
 import java.util.ArrayList;
 
-import android.content.Context;
-import android.view.SurfaceHolder;
-
-import com.ackermansoftware.dackdroid.GameLogic;
 import com.ackermansoftware.dackdroid.renderer.GameRenderer;
 
 /**
@@ -20,11 +16,26 @@ import com.ackermansoftware.dackdroid.renderer.GameRenderer;
  */
 public class GameEngine {
 
-	private static final int rendererFrameRate = 10; // fps
-	private static final int gameLogicFrameRate = 1; // fps
+	private final int rendererFrameRate;
+	private final int gameLogicFrameRate;
 
-	long totalFramesRendered = 0;
-	double averageFrameRate = 0.0;
+	public static class Stats {
+		public long totalFramesRendered = 0;
+		private long timeStarted = 0;
+
+		public double getAverageFPS() {
+			double nanosRunning = System.nanoTime() - timeStarted;
+			return (1000000000 * totalFramesRendered) / nanosRunning;
+		}
+
+		public void start() {
+			timeStarted = System.nanoTime();
+		}
+
+	}
+
+	public Stats logicStats = new Stats();
+	public Stats rendererStats = new Stats();
 
 	// Controls underlying threads' event loop. Setting to false causes them to
 	// finish their loop and return.
@@ -37,20 +48,22 @@ public class GameEngine {
 	private final ArrayList<GameThread> threads = new ArrayList<GameThread>();
 
 
-	// Setup all our game objects here.
-	public GameEngine(SurfaceHolder holder, Context context) {
-		renderer = new GameRenderer(holder, context.getResources());
-		gameLogic = new GameLogic(renderer);
+	// Get the renderer and logic from the system.
+	public GameEngine(GameSystem system, GameEngineSettings settings) {
+		renderer = system.getRenderer();
+		gameLogic = system.getGameLogic();
 
-		createThreads();
+		// Apply settings
+		this.rendererFrameRate = settings.rendererMaximumFps;
+		this.gameLogicFrameRate = settings.gameLogicMaximumFps;
 	}
 
 	private void createThreads() {
 		// Create game thread and rendering thread and add them to the list of
 		// threads we are keeping track of. This way, we can make sure to kill
 		// all when the game stops.
-		GameThread gameCode = new GameThread(gameLogic, gameLogicFrameRate);
-		GameThread renderingThread = new GameThread(renderer, rendererFrameRate);
+		GameThread gameCode = new GameThread(gameLogic, gameLogicFrameRate, logicStats);
+		GameThread renderingThread = new GameThread(renderer, rendererFrameRate, rendererStats);
 
 		// If we already ran the code, we may have dead threads
 		// in the array.
@@ -65,22 +78,30 @@ public class GameEngine {
 	class GameThread extends Thread {
 		private final ThreadedGameComponent gameComponent;
 		private final int requestedMsPerFrame;
+		private Stats stats = new Stats();
 
 		public GameThread(ThreadedGameComponent renderer, int requestedFrameRate) {
 			this.gameComponent = renderer;
 			this.requestedMsPerFrame = 1000 / requestedFrameRate;
 		}
 
+		public GameThread(ThreadedGameComponent renderer, int requestedFrameRate, Stats stats) {
+			this(renderer, requestedFrameRate);
+			this.stats = stats;
+		}
+
 		@Override
 		public void run() {
 			// Main thread loop. Will die if the parent class makes itself
 			// disabled.
+			stats.start();
 			while (enabled) {
 				// We want to track framerate and slowdown the thread if
 				// necessary.
 				long startTime = System.nanoTime();
 
 				gameComponent.executeFrame();
+				stats.totalFramesRendered++;
 
 				// If we finished early, wait until next frame.
 				long endTime = System.nanoTime();
