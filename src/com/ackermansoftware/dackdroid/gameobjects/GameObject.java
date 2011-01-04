@@ -14,6 +14,8 @@ import com.ackermansoftware.dackdroid.renderer.RenderQueue;
 
 public abstract class GameObject {
 
+	protected static final long NANOS_PER_MILLI = 1000000;
+
 	/**
 	 * This is the <b>first function executed in the pipeline</b>. Calculate any
 	 * new velocities or accelerations, or apply damage to NPCs, or other

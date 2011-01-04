@@ -63,7 +63,7 @@ public class GameRenderer implements ThreadedGameComponent, RenderQueue {
 				synchronized (frontBuffer) {
 					c.drawColor(Color.BLACK);
 					c.save();
-					c.translate(cameraPos.x, cameraPos.y);
+					c.translate(-cameraPos.x, -cameraPos.y);
 					for (Renderable r : frontBuffer) {
 						r.render(textures, c);
 					}
@@ -83,6 +83,7 @@ public class GameRenderer implements ThreadedGameComponent, RenderQueue {
 		// Don't touch the backBuffer right now!
 		synchronized (backBuffer) {
 			backBuffer.add(r);
+			r.beforeRender(textures);
 		}
 	}
 

@@ -11,28 +11,50 @@ import com.ackermansoftware.dackdroid.renderer.TextureLibrary;
 public class Material implements Renderable {
 
 	private PointF coordinates;
-	private final int texture;
+	private float rotation;
+	private final int textureId;
+	private Bitmap texture;
 
 	public Material(int texture) {
 		coordinates = new PointF();
-		this.texture = texture;
+		this.textureId = texture;
 	}
 
 	public Material(PointF initialPosition, int texture) {
-		coordinates = initialPosition;
-		this.texture = texture;
+		setNewPosition(initialPosition);
+		this.textureId = texture;
 	}
 
 	public void setNewPosition(PointF newPosition) {
-		coordinates = newPosition;
+		coordinates.set(newPosition);
+	}
+
+	public void setRotation(float newRotation) {
+		rotation = newRotation;
 	}
 
 	@Override
 	public void render(TextureLibrary textures, Canvas c) {
-		Bitmap icon = textures.getTexture(texture);
-		if (!c.quickReject(coordinates.x, coordinates.y, coordinates.x + icon.getWidth(),
-				coordinates.y + icon.getHeight(), EdgeType.BW)) {
-			c.drawBitmap(icon, coordinates.x, coordinates.y, null);
+		if (!c.quickReject(coordinates.x, coordinates.y, coordinates.x + texture.getWidth(),
+				coordinates.y + texture.getHeight(), EdgeType.BW)) {
+
+			// If we have rotation, we need to do a more complicated drawing
+			// sequence.
+			if (rotation != 0) {
+				c.save();
+				c.translate(coordinates.x, coordinates.y);
+				c.rotate(rotation);
+				c.drawBitmap(texture, 0, 0, null);
+				c.restore();
+			} else {
+				c.drawBitmap(texture, coordinates.x, coordinates.y, null);
+			}
+
 		}
+	}
+
+	@Override
+	public void beforeRender(TextureLibrary textures) {
+		texture = textures.getTexture(textureId);
 	}
 }

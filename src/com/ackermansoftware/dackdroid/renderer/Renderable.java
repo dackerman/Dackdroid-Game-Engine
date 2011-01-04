@@ -13,6 +13,14 @@ import android.graphics.Canvas;
 public interface Renderable{
 
 	/**
+	 * This function is called one time before any rendering takes place. It is
+	 * meant for a means to cache textures for future use by the object.
+	 * 
+	 * @param textures
+	 */
+	public void beforeRender(TextureLibrary textures);
+
+	/**
 	 * This function will be called on every frame that it is in the
 	 * RenderQueue. It will be supplied a TextureLibrary so it can get textures
 	 * from the system, and a Canvas object to draw upon. All synchronization
