@@ -6,23 +6,21 @@ import android.graphics.PointF;
 import android.graphics.Canvas.EdgeType;
 
 import com.ackermansoftware.dackdroid.renderer.Renderable;
-import com.ackermansoftware.dackdroid.renderer.TextureLibrary;
 
 public class Material implements Renderable {
 
 	private PointF coordinates;
 	private float rotation;
-	private final int textureId;
-	private Bitmap texture;
+	private final Bitmap texture;
 
-	public Material(int texture) {
+	public Material(Bitmap texture) {
 		coordinates = new PointF();
-		this.textureId = texture;
+		this.texture = texture;
 	}
 
-	public Material(PointF initialPosition, int texture) {
+	public Material(PointF initialPosition, Bitmap texture) {
 		setNewPosition(initialPosition);
-		this.textureId = texture;
+		this.texture = texture;
 	}
 
 	public void setNewPosition(PointF newPosition) {
@@ -34,7 +32,7 @@ public class Material implements Renderable {
 	}
 
 	@Override
-	public void render(TextureLibrary textures, Canvas c) {
+	public void render(Canvas c) {
 		if (!c.quickReject(coordinates.x, coordinates.y, coordinates.x + texture.getWidth(),
 				coordinates.y + texture.getHeight(), EdgeType.BW)) {
 
@@ -51,10 +49,5 @@ public class Material implements Renderable {
 			}
 
 		}
-	}
-
-	@Override
-	public void beforeRender(TextureLibrary textures) {
-		texture = textures.getTexture(textureId);
 	}
 }

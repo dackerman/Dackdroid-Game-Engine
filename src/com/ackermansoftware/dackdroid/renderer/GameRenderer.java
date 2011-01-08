@@ -24,8 +24,6 @@ public class GameRenderer implements ThreadedGameComponent, RenderQueue {
 	private final ArrayList<Renderable> buffer1 = new ArrayList<Renderable>();
 	private final ArrayList<Renderable> buffer2 = new ArrayList<Renderable>();
 
-	private final TextureLibrary textures;
-
 	private final CameraSystem camera;
 
 	// We will check this variable to see if we have already rendered the
@@ -36,7 +34,6 @@ public class GameRenderer implements ThreadedGameComponent, RenderQueue {
 	public GameRenderer(SurfaceHolder holder, Resources res, CameraSystem camera) {
 		this.surfaceholder = holder;
 		this.camera = camera;
-		textures = new TextureLibrary(res);
 
 		// Set front and back buffers. Front buffer is being currently rendered,
 		// and back buffer is the next frame which is getting populated with
@@ -44,9 +41,6 @@ public class GameRenderer implements ThreadedGameComponent, RenderQueue {
 		frontBuffer = buffer1;
 		backBuffer = buffer2;
 	}
-
-	// Perf
-	// millisPerFrame: 435.75
 
 	@Override
 	public void executeFrame() {
@@ -65,7 +59,7 @@ public class GameRenderer implements ThreadedGameComponent, RenderQueue {
 					c.save();
 					c.translate(-cameraPos.x, -cameraPos.y);
 					for (Renderable r : frontBuffer) {
-						r.render(textures, c);
+						r.render(c);
 					}
 					c.restore();
 					alreadyRendered.set(true);
@@ -83,7 +77,6 @@ public class GameRenderer implements ThreadedGameComponent, RenderQueue {
 		// Don't touch the backBuffer right now!
 		synchronized (backBuffer) {
 			backBuffer.add(r);
-			r.beforeRender(textures);
 		}
 	}
 
