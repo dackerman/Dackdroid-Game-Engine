@@ -1,17 +1,19 @@
 package com.ackermansoftware.dackdroid.core;
 
+import android.graphics.Bitmap;
+
 public class AnimationFrame {
-	public int drawable;
+	public Bitmap drawable;
 	public long duration;
 
 	/**
-	 * @param resourceId
-	 *          The ID of the drawable to render on the screen.
+	 * @param flyingBird1
+	 *            The ID of the drawable to render on the screen.
 	 * @param duration
-	 *          The duration of this frame in milliseconds.
+	 *            The duration of this frame in milliseconds.
 	 */
-	public AnimationFrame(int resourceId, long duration) {
-		this.drawable = resourceId;
+	public AnimationFrame(Bitmap flyingBird1, long duration) {
+		this.drawable = flyingBird1;
 		this.duration = duration;
 	}
 }
